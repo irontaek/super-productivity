@@ -338,18 +338,14 @@ test.describe('Multi-task drag', () => {
     await drop(page, page.locator('.section-container task-list').first());
     await expect(page.locator('.no-section task')).toHaveCount(500);
     await select(page, ['Large 496', 'Large 497']);
-    await page
+    const row496 = page
       .locator('task')
-      .filter({ has: page.locator('task-title', { hasText: 'Large 496', exact: true }) })
-      .locator('done-toggle')
-      .click();
+      .filter({ has: page.locator('task-title', { hasText: 'Large 496', exact: true }) });
+    await row496.locator('done-toggle').click();
     await expect(page.locator('task-multi-select-bar .bar')).toHaveCount(0);
     // Restore the task, then dragging an unselected row must remain a single drag.
-    await page
-      .locator('task')
-      .filter({ has: page.locator('task-title', { hasText: 'Large 496', exact: true }) })
-      .locator('done-toggle')
-      .click();
+    // The undone row lingers in its leave animation, so target the done copy.
+    await row496.locator('done-toggle[aria-checked="true"]').click();
     await select(page, ['Large 496', 'Large 497']);
     await startDrag(
       page,
